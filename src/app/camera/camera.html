@@ -1,0 +1,68 @@
+<div class="camera-container">
+    <canvas #canvasElement></canvas>
+    <video #videoElement autoplay playsinline muted style="display: none;"></video>
+
+
+    <!-- Zoom Slider (Only if supported) -->
+    <div class="zoom-container" *ngIf="zoomSupported">
+        <span>-</span>
+        <input type="range" [min]="minZoom" [max]="maxZoom" [step]="zoomStep" [value]="zoomLevel"
+            (input)="setZoom($event)">
+        <span>+</span>
+    </div>
+
+    <!-- Controls Bar -->
+    <div class="controls-container">
+        <!-- Left: Settings -->
+        <div class="control-group left">
+            <button class="control-btn settings-btn" (click)="toggleSettings()" title="Settings">
+                <span class="icon">⚙️</span>
+            </button>
+            <div class="settings-panel bottom-sheet" *ngIf="showSettings">
+                <h3>Settings</h3>
+
+                <div class="input-group">
+                    <label>Overlay Position</label>
+                    <div class="toggle-group">
+                        <button [class.active]="overlayPosition === 'top'"
+                            (click)="overlayPosition = 'top'">Top</button>
+                        <button [class.active]="overlayPosition === 'bottom'"
+                            (click)="overlayPosition = 'bottom'">Bottom</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Location Display</label>
+                    <div class="toggle-group">
+                        <button [class.active]="showAddress" (click)="showAddress = true">Address</button>
+                        <button [class.active]="!showAddress" (click)="showAddress = false">Lat/Long</button>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Project / Note</label>
+                    <input type="text" [(ngModel)]="customNote1" placeholder="Type here...">
+                </div>
+                <div class="input-group">
+                    <label>Tag / Detail</label>
+                    <input type="text" [(ngModel)]="customNote2" placeholder="Type here...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Center: Capture -->
+        <div class="control-group center">
+            <button class="shutter-btn" (click)="capturePhoto()" title="Take Photo">
+                <div class="inner"></div>
+            </button>
+        </div>
+
+        <!-- Right: Video -->
+        <div class="control-group right">
+            <button class="video-btn" [class.recording]="isRecording" (click)="toggleVideoRecording()"
+                title="Record Video">
+                <div class="icon"></div>
+            </button>
+        </div>
+    </div>
+</div>

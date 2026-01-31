@@ -1,0 +1,83 @@
+:root {
+    --primary-color: #6200ea;
+    --text-color: #333;
+    --bg-color: #f9f9f9;
+    --white: #ffffff;
+}
+
+.privacy-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--white);
+    /* Changed to white for container inside dark app? Or keeping light theme for policy? User provided white theme. */
+    color: var(--text-color);
+    max-width: 800px;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    min-height: 100vh;
+}
+
+/* Override global dark mode for this page if needed, or encapsulate */
+/* Since we used ViewEncapsulation.None, we need to be careful. 
+   But the user provided specific styles. Let's scope them to .privacy-container */
+
+.privacy-container header {
+    text-align: center;
+    padding: 40px 0;
+    border-bottom: 2px solid var(--primary-color);
+    margin-bottom: 30px;
+}
+
+.privacy-container h1 {
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.privacy-container h2 {
+    color: var(--text-color);
+    border-left: 4px solid var(--primary-color);
+    padding-left: 10px;
+    margin-top: 30px;
+}
+
+.privacy-container .subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-top: 10px;
+}
+
+.privacy-container p {
+    margin-bottom: 15px;
+}
+
+.privacy-container ul {
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+.privacy-container footer {
+    text-align: center;
+    margin-top: 50px;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+.privacy-container .highlight {
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+@media (max-width: 600px) {
+    .privacy-container {
+        padding: 15px;
+    }
+
+    .privacy-container h1 {
+        font-size: 2rem;
+    }
+}
