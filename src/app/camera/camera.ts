@@ -371,20 +371,37 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   startRecording() {
     const canvas = this.canvasElement.nativeElement;
-    const stream = canvas.captureStream(30);
-    if (this.stream) stream.getAudioTracks().forEach((track: MediaStreamTrack) => stream.addTrack(track));
+    const canvasStream = canvas.captureStream(30);
+
+    // Create a new stream combining video from canvas and audio from microphone
+    const combinedStream = new MediaStream([...canvasStream.getVideoTracks()]);
+
+    if (this.stream) {
+      this.stream.getAudioTracks().forEach(track => {
+        if (track.enabled) combinedStream.addTrack(track);
+        else console.warn('Audio track is disabled');
+      });
+    } else {
+      console.warn('No audio stream available');
+    }
+
+    // Determine MIME type (try mp4 first for compatibility)
+    const mimeTypes = ['video/mp4', 'video/webm; codecs=vp9,opus', 'video/webm'];
+    let selectedMimeType = '';
+    for (const type of mimeTypes) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        selectedMimeType = type;
+        break;
+      }
+    }
 
     this.recordedChunks = [];
     try {
-      const mimeTypes = ['video/mp4', 'video/webm; codecs=vp9', 'video/webm'];
-      let selectedMimeType = '';
-      for (const type of mimeTypes) {
-        if (MediaRecorder.isTypeSupported(type)) {
-          selectedMimeType = type;
-          break;
-        }
-      }
-      this.mediaRecorder = new MediaRecorder(stream, { mimeType: selectedMimeType || undefined });
+      this.mediaRecorder = new MediaRecorder(combinedStream, {
+        mimeType: selectedMimeType || undefined,
+        audioBitsPerSecond: 128000,
+        videoBitsPerSecond: 2500000
+      });
     } catch (e) {
       console.error('Record error:', e);
       return;
