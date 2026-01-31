@@ -15,9 +15,19 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
 
-  locationData: { latitude: number; longitude: number; address?: string } | null = null;
+  locationData: {
+    latitude: number;
+    longitude: number;
+    address?: string;
+    altitude?: number | null;
+    accuracy?: number | null;
+    heading?: number | null;
+  } | null = null;
   locationError: boolean = false;
   stream: MediaStream | null = null;
+
+  // Orientation
+  currentHeading: number = 0;
 
   // Configurable Fields
   customNote1: string = '';
@@ -44,6 +54,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     this.initLocation();
+    this.initCompass();
   }
 
   ngAfterViewInit(): void {
@@ -124,12 +135,37 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  initCompass() {
+    if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', (event: DeviceOrientationEvent) => {
+        // iOS requires 'webkitCompassHeading'
+        // Android/Standard uses 'alpha' (0-360)
+        let heading = null;
+
+        if ((event as any).webkitCompassHeading) {
+          heading = (event as any).webkitCompassHeading;
+        } else if (event.alpha !== null) {
+          heading = 360 - event.alpha; // Convert counter-clockwise to clockwise
+        }
+
+        if (heading !== null) {
+          this.currentHeading = heading;
+          if (this.locationData) {
+            this.locationData.heading = heading;
+          }
+        }
+      }, true);
+    }
+  }
+
   initLocation() {
     if ('geolocation' in navigator) {
       navigator.geolocation.watchPosition(
         async (position) => {
           const lat = position.coords.latitude;
           const long = position.coords.longitude;
+          const alt = position.coords.altitude;
+          const acc = position.coords.accuracy;
 
           let address = this.locationData?.address || '';
           if (!this.locationData || Math.abs(this.locationData.latitude - lat) > 0.0001) {
@@ -139,7 +175,10 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
           this.locationData = {
             latitude: lat,
             longitude: long,
-            address: address
+            address: address,
+            altitude: alt,
+            accuracy: acc,
+            heading: this.currentHeading
           };
           this.locationError = false;
         },
@@ -327,21 +366,61 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   capturePhoto() {
     const canvas = this.canvasElement.nativeElement;
-    let dataURL = canvas.toDataURL('image/jpeg', 1.0); // Must be JPEG for EXIF
+    let dataURL = canvas.toDataURL('image/jpeg', 1.0);
 
     if (this.locationData) {
       try {
         const lat = this.locationData.latitude;
         const lng = this.locationData.longitude;
+        const alt = this.locationData.altitude;
+        const heading = this.locationData.heading || this.currentHeading;
 
         const gpsIfd: any = {};
+
+        // 1. Latitude/Longitude
         gpsIfd[piexif.GPSIFD.GPSLatitudeRef] = lat < 0 ? 'S' : 'N';
         gpsIfd[piexif.GPSIFD.GPSLatitude] = this.toDMS(lat);
         gpsIfd[piexif.GPSIFD.GPSLongitudeRef] = lng < 0 ? 'W' : 'E';
         gpsIfd[piexif.GPSIFD.GPSLongitude] = this.toDMS(lng);
-        gpsIfd[piexif.GPSIFD.GPSDateStamp] = new Date().toISOString().substring(0, 10).replace(/-/g, ':');
 
-        const exifObj = { "0th": {}, "Exif": {}, "GPS": gpsIfd };
+        // 2. Altitude (Tag 6 = Altitude, 5 = AltRef)
+        // AltRef: 0 = Above Sea Level, 1 = Below Sea Level
+        if (alt !== null && alt !== undefined) {
+          gpsIfd[piexif.GPSIFD.GPSAltitudeRef] = 0; // Assuming above sea level mostly
+          gpsIfd[piexif.GPSIFD.GPSAltitude] = this.toRational(Math.abs(alt));
+        }
+
+        // 3. Image Direction (Tag 17 = ImgDirection, 16 = ImgDirectionRef)
+        if (heading !== null) {
+          gpsIfd[piexif.GPSIFD.GPSImgDirectionRef] = 'M'; // Magnetic North
+          gpsIfd[piexif.GPSIFD.GPSImgDirection] = this.toRational(heading);
+        }
+
+        // 4. Time
+        // DateStamp: YYYY:MM:DD, TimeStamp: fractional UTC
+        const now = new Date();
+        const gpsDate = now.toISOString().substring(0, 10).replace(/-/g, ':');
+        gpsIfd[piexif.GPSIFD.GPSDateStamp] = gpsDate;
+
+        gpsIfd[piexif.GPSIFD.GPSTimeStamp] = [
+          [now.getUTCHours(), 1],
+          [now.getUTCMinutes(), 1],
+          [now.getUTCSeconds(), 1]
+        ];
+
+        // Construct EXIF
+        const exifObj = {
+          "0th": {
+            [piexif.ImageIFD.Make]: "Kipsam Labs",
+            [piexif.ImageIFD.Model]: "Web GPS Camera",
+            [piexif.ImageIFD.Software]: "Kipsam Camera App v1.0"
+          },
+          "Exif": {
+            [piexif.ExifIFD.DateTimeOriginal]: now.toISOString().replace(/[:-]/g, '').substring(0, 15),
+          },
+          "GPS": gpsIfd
+        };
+
         const exifStr = piexif.dump(exifObj);
         dataURL = piexif.insert(exifStr, dataURL);
       } catch (e) {
@@ -350,9 +429,16 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const link = document.createElement('a');
-    link.download = `img_${Date.now()}.jpg`; // Changed to jpg
+    link.download = `img_${Date.now()}.jpg`;
     link.href = dataURL;
     link.click();
+  }
+
+  // Helper for Rational [numerator, denominator]
+  toRational(value: number): [number, number] {
+    const denominator = 1000;
+    const numerator = Math.round(value * denominator);
+    return [numerator, denominator];
   }
 
   toDMS(coordinate: number): [[number, number], [number, number], [number, number]] {
