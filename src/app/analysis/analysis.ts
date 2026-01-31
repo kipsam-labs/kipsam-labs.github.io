@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import * as L from 'leaflet';
 // @ts-ignore
 import * as piexif from 'piexifjs';
@@ -7,7 +8,7 @@ import * as piexif from 'piexifjs';
 @Component({
     selector: 'app-analysis',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterLink],
     templateUrl: './analysis.html',
     styleUrls: ['./analysis.css']
 })

@@ -6,15 +6,12 @@ html {
     width: 100%;
     height: 100%;
     /* Fallback */
-    height: 100dvh;
+    min-height: 100vh;
     /* Dynamic Height for mobile browsers */
     background-color: #000;
     color: #fff;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    overflow: hidden;
-    /* Prevent scrolling absolutely */
-    position: fixed;
-    /* Lock body on iOS */
+    overflow-x: hidden;
 }
 
 *,

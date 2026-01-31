@@ -77,12 +77,14 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async initCamera() {
     try {
-      // Request high resolution to get the widest field of view (reduces cropping/zoom effect)
+      // Request 4:3 aspect ratio (standard photo sensor) to prevent driver-side cropping
+      // and high resolution for clarity.
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: 'environment',
-          width: { ideal: 3840 },
-          height: { ideal: 2160 }
+          aspectRatio: { ideal: 1.333 }, // 4:3 aspect ratio
+          width: { ideal: 4096 },
+          height: { ideal: 3072 }
         },
         audio: true
       });
