@@ -31,5 +31,5 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist/gps-camera-app/browser # Correct for @angular/build:application
+          folder: dist/gps-camera-app # Adjusted based on local build output
           branch: gh-pages
