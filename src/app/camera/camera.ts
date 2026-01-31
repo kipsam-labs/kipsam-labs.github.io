@@ -138,6 +138,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   initCompass() {
     if (window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', (event: DeviceOrientationEvent) => {
+        console.log('Heading Event:', event.alpha, (event as any).webkitCompassHeading);
         // iOS requires 'webkitCompassHeading'
         // Android/Standard uses 'alpha' (0-360)
         let heading = null;
