@@ -66,8 +66,9 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   async initCamera() {
     try {
+      // Remove specific resolution constraints to let device pick native/best fit (prevents zoom/crop on mobile)
       this.stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+        video: { facingMode: 'environment' },
         audio: true
       });
 
@@ -77,6 +78,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const video = this.videoElement.nativeElement;
+      video.muted = true; // Force mute to prevent feedback
       video.srcObject = this.stream;
 
       // Check for Zoom Capabilities
