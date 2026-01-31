@@ -80,6 +80,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       const video = this.videoElement.nativeElement;
       video.muted = true; // Force mute to prevent feedback
       video.srcObject = this.stream;
+      video.play().catch(e => console.error('Video play error:', e));
 
       // Check for Zoom Capabilities
       const track = this.stream.getVideoTracks()[0];
@@ -200,15 +201,42 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       if (video.readyState === video.HAVE_ENOUGH_DATA && ctx) {
-        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
+        // 1. Set Canvas size to Display size (Resolution independence)
+        const displayWidth = canvas.clientWidth;
+        const displayHeight = canvas.clientHeight;
+
+        if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+          canvas.width = displayWidth;
+          canvas.height = displayHeight;
         }
 
-        // Clear canvas to prevent ghosting
+        // 2. Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        // 3. Calculate Scale to Simulate "object-fit: cover"
+        const videoRatio = video.videoWidth / video.videoHeight;
+        const canvasRatio = canvas.width / canvas.height;
+
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (canvasRatio > videoRatio) {
+          // Canvas is wider than video -> Match Width, Crop Height
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / videoRatio;
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2;
+        } else {
+          // Canvas is taller than video (or equal) -> Match Height, Crop Width
+          drawHeight = canvas.height;
+          drawWidth = canvas.height * videoRatio;
+          offsetY = 0;
+          offsetX = (canvas.width - drawWidth) / 2;
+        }
+
+        // 4. Draw Video (Centered & Scaled)
+        ctx.drawImage(video, offsetX, offsetY, drawWidth, drawHeight);
+
+        // 5. Draw Overlay
         this.drawOverlay(ctx, canvas.width, canvas.height);
       }
       this.animationFrameId = requestAnimationFrame(loop);
@@ -258,6 +286,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Draw Background
     ctx.save();
+    ctx.beginPath(); // Critical: Reset path to avoid accumulating previous frames
     ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
     ctx.roundRect(padding, boxY, maxWidth, boxHeight, 15);
     ctx.fill();
