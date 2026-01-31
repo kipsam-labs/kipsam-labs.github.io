@@ -256,7 +256,11 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     // 1. Date/Time
     lines.push(new Date().toLocaleString());
 
-    // 2. Location (Conditional Display)
+    // 2. Custom Notes (Moved before address)
+    if (this.customNote1) lines.push(this.customNote1);
+    if (this.customNote2) lines.push(this.customNote2);
+
+    // 3. Location (Conditional Display)
     if (this.locationData) {
       let locationText = '';
 
@@ -269,10 +273,6 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       const addrLines = this.wrapText(ctx, locationText, maxWidth);
       lines.push(...addrLines);
     }
-
-    // 3. Custom Notes
-    if (this.customNote1) lines.push(this.customNote1);
-    if (this.customNote2) lines.push(this.customNote2);
 
     // Calculate Box
     const totalTextHeight = lines.length * lineHeight;
