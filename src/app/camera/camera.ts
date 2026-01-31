@@ -430,7 +430,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const link = document.createElement('a');
-    link.download = `img_${Date.now()}.jpg`;
+    link.download = `kipsam-labs_img_${Date.now()}.jpg`;
     link.href = dataURL;
     link.click();
   }
@@ -509,7 +509,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       const link = document.createElement('a');
       link.href = url;
       const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
-      link.download = `vid_${Date.now()}.${ext}`;
+      link.download = `kipsam-labs_vid_${Date.now()}.${ext}`;
       link.click();
       window.URL.revokeObjectURL(url);
     };

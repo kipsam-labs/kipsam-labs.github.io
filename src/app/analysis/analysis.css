@@ -1,0 +1,140 @@
+.analysis-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    color: white;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.upload-section {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 3rem;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.upload-section:hover {
+    border-color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.file-input {
+    display: none;
+}
+
+.upload-btn {
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: #4CAF50;
+    border-radius: 30px;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.image-preview img {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.metadata-card {
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.label {
+    color: #aaa;
+}
+
+.value {
+    font-family: monospace;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.map-container {
+    height: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+}
+
+.error-msg {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid #f44336;
+    color: #ff8a80;
+    border-radius: 8px;
+}
+
+.share-btn {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 1rem;
+    background: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.share-btn:hover {
+    background: #1976D2;
+}

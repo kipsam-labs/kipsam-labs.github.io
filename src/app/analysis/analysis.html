@@ -1,0 +1,56 @@
+<div class="analysis-container">
+    <div class="header">
+        <h1>Photo Analysis</h1>
+        <button routerLink="/" class="back-btn">← Back</button>
+    </div>
+
+    <div class="upload-section">
+        <input type="file" (change)="onFileSelected($event)" accept="image/jpeg, image/jpg" id="fileInput"
+            class="file-input">
+        <label for="fileInput" class="upload-btn">
+            <span>📂 Upload Image</span>
+        </label>
+    </div>
+
+    <div class="content-grid" *ngIf="selectedImage">
+        <div class="image-preview">
+            <img [src]="selectedImage" alt="Analyzed Photo">
+
+            <div class="metadata-card" *ngIf="metadata">
+                <h3>GIS Metadata</h3>
+                <div class="meta-row">
+                    <span class="label">Latitude</span>
+                    <span class="value">{{ metadata.latitude | number:'1.5-5' }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="label">Longitude</span>
+                    <span class="value">{{ metadata.longitude | number:'1.5-5' }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="label">Altitude</span>
+                    <span class="value">{{ metadata.altitude }} m</span>
+                </div>
+                <div class="meta-row">
+                    <span class="label">Time</span>
+                    <span class="value">{{ metadata.dateTime }}</span>
+                </div>
+                <div class="meta-row">
+                    <span class="label">Camera</span>
+                    <span class="value">{{ metadata.camera }}</span>
+                </div>
+
+                <button class="share-btn" (click)="shareAnalysis()">
+                    <span>📤 Share Location</span>
+                </button>
+            </div>
+
+            <div class="error-msg" *ngIf="error">
+                ⚠️ {{ error }}
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+    </div>
+</div>
