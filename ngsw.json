@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1770056517020,
+  "timestamp": 1770057978256,
   "index": "https://kipsam-labs.github.io/index.html",
   "assetGroups": [
     {
@@ -13,9 +13,9 @@
       "urls": [
         "https://kipsam-labs.github.io/favicon.ico",
         "https://kipsam-labs.github.io/index.html",
-        "https://kipsam-labs.github.io/main-Q2NBJPXC.js",
+        "https://kipsam-labs.github.io/main-R6KEBFKT.js",
         "https://kipsam-labs.github.io/manifest.webmanifest",
-        "https://kipsam-labs.github.io/styles-GADTOJLV.css"
+        "https://kipsam-labs.github.io/styles-KQGW25S4.css"
       ],
       "patterns": []
     },
@@ -61,13 +61,13 @@
     "https://kipsam-labs.github.io/icons/icon-512x512.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
     "https://kipsam-labs.github.io/icons/icon-72x72.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
     "https://kipsam-labs.github.io/icons/icon-96x96.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
-    "https://kipsam-labs.github.io/index.html": "46c3cbba9559396cc73cfaf8843b18da6ad20169",
-    "https://kipsam-labs.github.io/main-Q2NBJPXC.js": "012f4a3922f6a55c2a692935be4838048bfc83a0",
+    "https://kipsam-labs.github.io/index.html": "32e059d50cb0a9d44eadeb0d3e1b2321b56d5f8c",
+    "https://kipsam-labs.github.io/main-R6KEBFKT.js": "0b3c0ce2c9e99ddd7a44e078aee946fb9f6a0e40",
     "https://kipsam-labs.github.io/manifest.webmanifest": "90ffae0291c3ae64c58af37b7574d167f8d4d9c2",
     "https://kipsam-labs.github.io/media/layers-2x-TBM42ERR.png": "152a162333e46d24f9d89f566312fc0c64011dee",
     "https://kipsam-labs.github.io/media/layers-55W3Q4RM.png": "c9e7528e491a39232ba24a2706c6c739d6fb0f06",
     "https://kipsam-labs.github.io/media/marker-icon-2V3QKKVC.png": "60a90bcbb2b42b7ddb4556db94eb7c1084b0e5da",
-    "https://kipsam-labs.github.io/styles-GADTOJLV.css": "4241397c7264b84b3d5db5d038e9728e1b233bed"
+    "https://kipsam-labs.github.io/styles-KQGW25S4.css": "194c7882a8b52c88b67dc440534e9cd217b3f4b2"
   },
   "navigationUrls": [
     {
