@@ -73,14 +73,14 @@ export class AnalysisComponent implements OnInit {
             // Extract GPS
             const lat = this.dmsToDecimal(gps[piexif.GPSIFD.GPSLatitude], gps[piexif.GPSIFD.GPSLatitudeRef]);
             const lng = this.dmsToDecimal(gps[piexif.GPSIFD.GPSLongitude], gps[piexif.GPSIFD.GPSLongitudeRef]);
-            const alt = gps[piexif.GPSIFD.GPSAltitude] ? this.rationalToDecimal(gps[piexif.GPSIFD.GPSAltitude]) : 'N/A';
+            // const alt = gps[piexif.GPSIFD.GPSAltitude] ? this.rationalToDecimal(gps[piexif.GPSIFD.GPSAltitude]) : 'N/A';
 
-            console.log('Resolved Coordinates:', lat, lng, alt);
+            console.log('Resolved Coordinates:', lat, lng);
 
             this.metadata = {
                 latitude: lat,
                 longitude: lng,
-                altitude: alt,
+                // altitude: alt,
                 dateTime: exifObj['Exif'][piexif.ExifIFD.DateTimeOriginal] || 'Unknown',
                 camera: exifObj['0th'][piexif.ImageIFD.Model] || 'Unknown'
             };

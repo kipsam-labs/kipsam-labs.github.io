@@ -3,11 +3,12 @@ import { Component, ElementRef, OnInit, ViewChild, OnDestroy, AfterViewInit } fr
 import * as piexif from 'piexifjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FeedbackComponent } from '../feedback/feedback.component';
 
 @Component({
   selector: 'app-camera',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FeedbackComponent],
   templateUrl: './camera.html',
   styleUrl: './camera.css'
 })
@@ -44,6 +45,13 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   maxZoom: number = 1;
   zoomSupported: boolean = false;
   zoomStep: number = 0.1;
+
+  // Camera Switch
+  facingMode: 'environment' | 'user' = 'environment';
+
+  // Flash/Torch
+  flashSupported: boolean = false;
+  flashOn: boolean = false;
 
   // Video Recording
   mediaRecorder: MediaRecorder | null = null;
@@ -84,7 +92,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       // and high resolution for clarity.
       this.stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment',
+          facingMode: this.facingMode,
           aspectRatio: { ideal: 1.333 }, // 4:3 aspect ratio
           width: { ideal: 4096 },
           height: { ideal: 3072 }
@@ -115,6 +123,10 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
           this.zoomStep = capabilities.zoom.step;
           this.zoomLevel = this.minZoom;
         }
+        // Check for flash/torch support
+        if (capabilities && capabilities.torch) {
+          this.flashSupported = true;
+        }
       }
 
       video.onloadedmetadata = () => {
@@ -128,6 +140,41 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
 
   retryCamera() {
     this.initCamera();
+  }
+
+  // Switch between front and back camera
+  async switchCamera() {
+    // Stop current stream
+    if (this.stream) {
+      this.stream.getTracks().forEach(track => track.stop());
+    }
+
+    // Toggle facing mode
+    this.facingMode = this.facingMode === 'environment' ? 'user' : 'environment';
+
+    // Reset flash state since we're changing cameras
+    this.flashOn = false;
+    this.flashSupported = false;
+
+    // Reinitialize camera
+    await this.initCamera();
+  }
+
+  // Toggle flash/torch
+  async toggleFlash() {
+    if (!this.stream || !this.flashSupported) return;
+
+    const track = this.stream.getVideoTracks()[0];
+    this.flashOn = !this.flashOn;
+
+    try {
+      await (track as any).applyConstraints({
+        advanced: [{ torch: this.flashOn }]
+      });
+    } catch (err) {
+      console.error('Flash toggle error:', err);
+      this.flashOn = false;
+    }
   }
 
   dismissGpsError() {

@@ -9,6 +9,17 @@
         <button (click)="dismissGpsError()">Dismiss</button>
     </div>
 
+    <!-- Top Toolbar -->
+    <div class="top-toolbar">
+        <button class="toolbar-btn" (click)="switchCamera()" title="Switch Camera">
+            <span class="icon">🔄</span>
+        </button>
+        <button class="toolbar-btn" *ngIf="flashSupported" (click)="toggleFlash()" [class.active]="flashOn"
+            title="Toggle Flash">
+            <span class="icon">{{ flashOn ? '⚡' : '🔦' }}</span>
+        </button>
+    </div>
+
     <canvas #canvasElement></canvas>
     <video #videoElement autoplay playsinline muted style="display: none;"></video>
 
@@ -75,4 +86,7 @@
             </button>
         </div>
     </div>
+
+    <!-- Feedback Button (Camera page only) -->
+    <app-feedback></app-feedback>
 </div>

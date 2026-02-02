@@ -18,17 +18,32 @@ export class FeedbackComponent {
     isSubmitting = false;
     successMessage = '';
     errorMessage = '';
+    private isCapturingScreenshot = false;
 
     constructor(private feedbackService: FeedbackService) { }
 
     toggleModal() {
+        // Don't toggle if we're in the middle of capturing a screenshot
+        if (this.isCapturingScreenshot) {
+            return;
+        }
+
+        // If closing while submitting, cancel the submit state
+        if (this.isOpen && this.isSubmitting) {
+            this.isSubmitting = false;
+        }
+
         this.isOpen = !this.isOpen;
-        this.successMessage = '';
-        this.errorMessage = '';
+
+        // Reset messages when opening fresh
+        if (this.isOpen) {
+            this.successMessage = '';
+            this.errorMessage = '';
+        }
     }
 
     async submit() {
-        if (!this.feedbackText.trim()) return;
+        if (!this.feedbackText.trim() || this.isSubmitting) return;
 
         this.isSubmitting = true;
         this.errorMessage = '';
@@ -36,36 +51,54 @@ export class FeedbackComponent {
 
         try {
             if (this.includeScreenshot) {
-                // Capture everything except the feedback modal itself (optional optimization)
-                // For simplicity, capture body. We temporarily hide modal to capture clean screen?
-                // Or just capture as is.
-                this.isOpen = false; // Hide to capture under
-                // Wait for render
-                await new Promise(r => setTimeout(r, 100));
+                // Mark that we're capturing to prevent toggle during this phase
+                this.isCapturingScreenshot = true;
+                this.isOpen = false; // Hide to capture clean screen
 
-                const canvas = await html2canvas(document.body, {
-                    scale: 0.5,
-                    logging: false,
-                    useCORS: true
-                });
-                blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.4));
+                // Wait for render
+                await new Promise(r => setTimeout(r, 150));
+
+                try {
+                    const canvas = await html2canvas(document.body, {
+                        scale: 0.5,
+                        logging: false,
+                        useCORS: true
+                    });
+                    blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.4));
+                } catch (screenshotError) {
+                    console.warn('Screenshot capture failed, continuing without:', screenshotError);
+                    // Continue without screenshot if capture fails
+                }
 
                 this.isOpen = true; // Show again
+                this.isCapturingScreenshot = false;
             }
 
             await this.feedbackService.submitFeedback(this.feedbackText, blob);
+
             this.successMessage = 'Thanks for your feedback!';
             this.feedbackText = '';
+            this.isSubmitting = false;
+
             setTimeout(() => {
                 this.isOpen = false;
                 this.successMessage = '';
             }, 2000);
-        } catch (e) {
-            console.error(e);
+
+        } catch (e: any) {
+            console.error('Feedback submission error:', e);
+            this.isCapturingScreenshot = false;
             this.isOpen = true; // Ensure visible
-            this.errorMessage = 'Failed to submit. Check internet or API Key.';
-        } finally {
             this.isSubmitting = false;
+
+            // Provide more specific error message
+            if (e.message?.includes('Firebase not configured')) {
+                this.errorMessage = 'Feedback service not available. Please try again later.';
+            } else if (e.code === 'storage/unauthorized') {
+                this.errorMessage = 'Permission denied. Please check Firebase settings.';
+            } else {
+                this.errorMessage = 'Failed to submit. Please check your internet connection.';
+            }
         }
     }
 }

@@ -1,38 +1,70 @@
-<div class="landing-container">
+<div class="landing-container" [class.light-theme]="currentTheme === 'light'">
+    <!-- Header with Theme Toggle -->
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">📍</span>
+            <span class="logo-text">GPS Camera</span>
+        </div>
+        <button class="theme-toggle" (click)="toggleTheme()"
+            [attr.aria-label]="currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'">
+            <span class="theme-icon">{{ currentTheme === 'dark' ? '☀️' : '🌙' }}</span>
+        </button>
+    </header>
+
+    <!-- Hero Section -->
     <div class="hero-section">
         <div class="glow-effect"></div>
-        <h1 class="title">GPS Camera</h1>
-        <p class="subtitle">Capture moments with precision. Location, Time, and Context embedded.</p>
+        <div class="hero-content">
+            <h1 class="title">
+                <span class="title-line">GPS</span>
+                <span class="title-line gradient-text">Camera</span>
+            </h1>
+            <p class="subtitle">Capture moments with precision. Location, Time, and Context embedded in every shot.</p>
 
-        <button class="cta-button" (click)="startCamera()">
-            <span class="icon">📷</span> Launch Camera
-        </button>
-        <button class="cta-button secondary" routerLink="/analysis"
-            style="margin-top: 15px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);">
-            <span class="icon">🔍</span> Analyze Photo
-        </button>
-    </div>
-
-    <div class="features-grid">
-        <div class="feature-card">
-            <span class="feature-icon">📍</span>
-            <h3>Precise Location</h3>
-            <p>Embed exact coordinates and address.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-icon">📅</span>
-            <h3>Time Stamped</h3>
-            <p>Automatic date/time overlays.</p>
-        </div>
-        <div class="feature-card">
-            <span class="feature-icon">📝</span>
-            <h3>Smart Notes</h3>
-            <p>Add context to your photos.</p>
+            <div class="cta-group">
+                <button class="cta-button primary" (click)="startCamera()">
+                    <span class="btn-icon">📷</span>
+                    <span class="btn-text">Launch Camera</span>
+                </button>
+                <button class="cta-button secondary" routerLink="/analysis">
+                    <span class="btn-icon">🔍</span>
+                    <span class="btn-text">Analyze Photo</span>
+                </button>
+            </div>
         </div>
     </div>
 
+    <!-- Features Section -->
+    <section class="features-section">
+        <h2 class="section-title">Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">📍</span>
+                </div>
+                <h3>Precise Location</h3>
+                <p>Embed exact coordinates and readable address on your photos.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">📅</span>
+                </div>
+                <h3>Time Stamped</h3>
+                <p>Automatic date and time overlays for documentation.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon-wrapper">
+                    <span class="feature-icon">📝</span>
+                </div>
+                <h3>Smart Notes</h3>
+                <p>Add custom notes and project details to your captures.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
     <footer class="footer">
-        <p>Made with ❤️ for Kipsam Labs. | <a routerLink="/privacy-policy"
-                style="color: #888; text-decoration: none;">Privacy Policy</a></p>
+        <p>Made with ❤️ by Kipsam Labs</p>
+        <a routerLink="/privacy-policy" class="footer-link">Privacy Policy</a>
     </footer>
 </div>
