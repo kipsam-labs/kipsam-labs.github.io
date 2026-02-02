@@ -42,3 +42,5 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+src/app/YOUR_PROJECT_ID_HERE-firebase-adminsdk-fbsvc-620873af08.json

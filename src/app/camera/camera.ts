@@ -23,7 +23,9 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     accuracy?: number | null;
     heading?: number | null;
   } | null = null;
-  locationError: boolean = false;
+  // Errors
+  cameraError: string | null = null;
+  gpsError: string | null = null;
   stream: MediaStream | null = null;
 
   // Orientation
@@ -76,6 +78,7 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   async initCamera() {
+    this.cameraError = null;
     try {
       // Request 4:3 aspect ratio (standard photo sensor) to prevent driver-side cropping
       // and high resolution for clarity.
@@ -119,9 +122,16 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     } catch (err: any) {
       console.error('Error accessing camera:', err);
-      // Show specific error to user
-      alert(`Camera Error: ${err.name} - ${err.message}. \n\nEnsure you are using HTTPS and have granted permissions.`);
+      this.cameraError = `Camera Access Error: ${err.message || 'Unknown error'}`;
     }
+  }
+
+  retryCamera() {
+    this.initCamera();
+  }
+
+  dismissGpsError() {
+    this.gpsError = null;
   }
 
   setZoom(event: any) {
@@ -183,16 +193,16 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
             accuracy: acc,
             heading: this.currentHeading
           };
-          this.locationError = false;
+          this.gpsError = null;
         },
         (error) => {
           console.error('Error getting location:', error);
-          this.locationError = true;
+          this.gpsError = 'GPS Access Denied. Location tags disabled.';
         },
         { enableHighAccuracy: true }
       );
     } else {
-      this.locationError = true;
+      this.gpsError = 'Geolocation not supported by this browser.';
     }
   }
 
@@ -307,13 +317,14 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.customNote2) lines.push(this.customNote2);
 
     // 3. Location (Conditional Display)
-    if (this.locationData) {
+    const loc = this.locationData;
+    if (loc) {
       let locationText = '';
 
       if (this.showAddress) {
-        locationText = this.locationData.address || 'Address not found';
+        locationText = loc.address || 'Address not found';
       } else {
-        locationText = `Lat: ${this.locationData.latitude.toFixed(5)}, Long: ${this.locationData.longitude.toFixed(5)}`;
+        locationText = `Lat: ${loc.latitude.toFixed(5)}, Long: ${loc.longitude.toFixed(5)}`;
       }
 
       const addrLines = this.wrapText(ctx, locationText, maxWidth);

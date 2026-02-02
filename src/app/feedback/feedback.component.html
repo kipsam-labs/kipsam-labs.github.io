@@ -1,0 +1,36 @@
+<!-- Floating Trigger Button -->
+<button class="feedback-trigger" (click)="toggleModal()" title="Report Issue">
+    ?
+</button>
+
+<!-- Modal -->
+<div class="feedback-modal" *ngIf="isOpen">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Feedback</h3>
+            <button class="close-btn" (click)="toggleModal()">×</button>
+        </div>
+
+        <div class="modal-body" *ngIf="!successMessage">
+            <textarea [(ngModel)]="feedbackText" placeholder="Describe the issue or suggestion..." rows="4"></textarea>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="screenshot" [(ngModel)]="includeScreenshot">
+                <label for="screenshot">Include Screenshot</label>
+            </div>
+
+            <p class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</p>
+        </div>
+
+        <div class="success-body" *ngIf="successMessage">
+            <div class="checkmark">✓</div>
+            <p>{{ successMessage }}</p>
+        </div>
+
+        <div class="modal-footer" *ngIf="!successMessage">
+            <button class="submit-btn" (click)="submit()" [disabled]="isSubmitting || !feedbackText.trim()">
+                {{ isSubmitting ? 'Sending...' : 'Send Feedback' }}
+            </button>
+        </div>
+    </div>
+</div>

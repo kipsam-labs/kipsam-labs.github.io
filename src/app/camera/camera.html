@@ -1,4 +1,14 @@
 <div class="camera-container">
+    <!-- Error Banners -->
+    <div class="error-banner" *ngIf="cameraError">
+        <p>⚠️ {{ cameraError }}</p>
+        <button (click)="retryCamera()">Retry</button>
+    </div>
+    <div class="warning-banner" *ngIf="gpsError">
+        <p>📍 {{ gpsError }}</p>
+        <button (click)="dismissGpsError()">Dismiss</button>
+    </div>
+
     <canvas #canvasElement></canvas>
     <video #videoElement autoplay playsinline muted style="display: none;"></video>
 

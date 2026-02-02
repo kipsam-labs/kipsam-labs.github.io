@@ -18,6 +18,46 @@ canvas {
     display: block;
 }
 
+/* Error Banners */
+.error-banner, .warning-banner {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 200;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    background: rgba(255, 68, 68, 0.9);
+    color: white;
+}
+
+.warning-banner {
+    background: rgba(255, 187, 51, 0.95);
+    color: #333;
+}
+
+.error-banner p, .warning-banner p {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.error-banner button, .warning-banner button {
+    background: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+}
+
 /* Zoom Slider */
 .zoom-container {
     position: absolute;
