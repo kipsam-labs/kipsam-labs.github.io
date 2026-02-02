@@ -1,0 +1,91 @@
+{
+  "configVersion": 1,
+  "timestamp": 1770052998254,
+  "index": "https://kipsam-labs.github.io/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "https://kipsam-labs.github.io/favicon.ico",
+        "https://kipsam-labs.github.io/index.html",
+        "https://kipsam-labs.github.io/main-GD2NHR7T.js",
+        "https://kipsam-labs.github.io/manifest.webmanifest",
+        "https://kipsam-labs.github.io/styles-GADTOJLV.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "https://kipsam-labs.github.io/assets/hero-bg.png",
+        "https://kipsam-labs.github.io/assets/marker-icon-2x.png",
+        "https://kipsam-labs.github.io/assets/marker-icon.png",
+        "https://kipsam-labs.github.io/assets/marker-shadow.png",
+        "https://kipsam-labs.github.io/icons/icon-128x128.png",
+        "https://kipsam-labs.github.io/icons/icon-144x144.png",
+        "https://kipsam-labs.github.io/icons/icon-152x152.png",
+        "https://kipsam-labs.github.io/icons/icon-192x192.png",
+        "https://kipsam-labs.github.io/icons/icon-384x384.png",
+        "https://kipsam-labs.github.io/icons/icon-512x512.png",
+        "https://kipsam-labs.github.io/icons/icon-72x72.png",
+        "https://kipsam-labs.github.io/icons/icon-96x96.png",
+        "https://kipsam-labs.github.io/media/layers-2x-TBM42ERR.png",
+        "https://kipsam-labs.github.io/media/layers-55W3Q4RM.png",
+        "https://kipsam-labs.github.io/media/marker-icon-2V3QKKVC.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "https://kipsam-labs.github.io/assets/hero-bg.png": "f4852803c754a2a8dd522c733d4ea408e2d0104e",
+    "https://kipsam-labs.github.io/assets/marker-icon-2x.png": "cf3a536596b1f58e0ac805404183c8e6d6bdacb5",
+    "https://kipsam-labs.github.io/assets/marker-icon.png": "60a90bcbb2b42b7ddb4556db94eb7c1084b0e5da",
+    "https://kipsam-labs.github.io/assets/marker-shadow.png": "7b6a8df63930381e96604e705168d0527d6b82bc",
+    "https://kipsam-labs.github.io/favicon.ico": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/icons/icon-128x128.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/icons/icon-144x144.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/icons/icon-152x152.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/icons/icon-192x192.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/icons/icon-384x384.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/icons/icon-512x512.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/icons/icon-72x72.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/icons/icon-96x96.png": "8b018b58f3604c8f42089660a0ff72c1924fd300",
+    "https://kipsam-labs.github.io/index.html": "c7acce15fa2bde36451251672b2ef4cbe3c143ad",
+    "https://kipsam-labs.github.io/main-GD2NHR7T.js": "22190252b1a143adf362c6e15c5511242448d479",
+    "https://kipsam-labs.github.io/manifest.webmanifest": "90ffae0291c3ae64c58af37b7574d167f8d4d9c2",
+    "https://kipsam-labs.github.io/media/layers-2x-TBM42ERR.png": "152a162333e46d24f9d89f566312fc0c64011dee",
+    "https://kipsam-labs.github.io/media/layers-55W3Q4RM.png": "c9e7528e491a39232ba24a2706c6c739d6fb0f06",
+    "https://kipsam-labs.github.io/media/marker-icon-2V3QKKVC.png": "60a90bcbb2b42b7ddb4556db94eb7c1084b0e5da",
+    "https://kipsam-labs.github.io/styles-GADTOJLV.css": "4241397c7264b84b3d5db5d038e9728e1b233bed"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
