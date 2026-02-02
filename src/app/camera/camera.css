@@ -19,7 +19,8 @@ canvas {
 }
 
 /* Error Banners */
-.error-banner, .warning-banner {
+.error-banner,
+.warning-banner {
     position: absolute;
     top: 20px;
     left: 50%;
@@ -32,7 +33,7 @@ canvas {
     justify-content: space-between;
     align-items: center;
     z-index: 200;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     background: rgba(255, 68, 68, 0.9);
     color: white;
 }
@@ -42,13 +43,15 @@ canvas {
     color: #333;
 }
 
-.error-banner p, .warning-banner p {
+.error-banner p,
+.warning-banner p {
     margin: 0;
     font-size: 14px;
     font-weight: 600;
 }
 
-.error-banner button, .warning-banner button {
+.error-banner button,
+.warning-banner button {
     background: white;
     border: none;
     padding: 5px 12px;
@@ -114,6 +117,26 @@ canvas {
     justify-content: space-between;
     align-items: center;
     z-index: 10;
+}
+
+@media (max-width: 480px) {
+
+    .error-banner,
+    .warning-banner {
+        min-width: 280px;
+        font-size: 13px;
+        padding: 10px 15px;
+    }
+
+    .controls-container {
+        padding: 15px 20px;
+        padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    }
+
+    .zoom-container {
+        width: 90%;
+        bottom: 100px;
+    }
 }
 
 .control-group {

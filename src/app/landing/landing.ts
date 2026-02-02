@@ -1,4 +1,4 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, HostListener } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -16,5 +16,12 @@ export class LandingComponent {
 
     startCamera() {
         this.router.navigate(['/camera']);
+    }
+
+    @HostListener('document:mousemove', ['$event'])
+    onMouseMove(e: MouseEvent) {
+        const doc = document.documentElement;
+        doc.style.setProperty('--mouse-x', `${e.clientX}px`);
+        doc.style.setProperty('--mouse-y', `${e.clientY}px`);
     }
 }

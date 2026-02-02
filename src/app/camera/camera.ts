@@ -269,24 +269,25 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
         // 2. Clear canvas
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // 3. Calculate Scale to Simulate "object-fit: cover"
+        // 3. Calculate Scale to Show Full Field of View (Natural)
         const videoRatio = video.videoWidth / video.videoHeight;
         const canvasRatio = canvas.width / canvas.height;
 
         let drawWidth, drawHeight, offsetX, offsetY;
 
+        // Logic: "Contain" (Fit entire image)
         if (canvasRatio > videoRatio) {
-          // Canvas is wider than video -> Match Width, Crop Height
-          drawWidth = canvas.width;
-          drawHeight = canvas.width / videoRatio;
-          offsetX = 0;
-          offsetY = (canvas.height - drawHeight) / 2;
-        } else {
-          // Canvas is taller than video (or equal) -> Match Height, Crop Width
+          // Canvas is wider than video -> Match Height, Letterbox Sides
           drawHeight = canvas.height;
           drawWidth = canvas.height * videoRatio;
           offsetY = 0;
           offsetX = (canvas.width - drawWidth) / 2;
+        } else {
+          // Canvas is taller/narrower than video -> Match Width, Letterbox Top/Bottom
+          drawWidth = canvas.width;
+          drawHeight = canvas.width / videoRatio;
+          offsetX = 0;
+          offsetY = (canvas.height - drawHeight) / 2;
         }
 
         // 4. Draw Video (Centered & Scaled)
@@ -301,62 +302,158 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   drawOverlay(ctx: CanvasRenderingContext2D, width: number, height: number) {
-    const fontSize = Math.max(20, width / 40);
-    ctx.font = `bold ${fontSize}px Arial`;
+    // Responsive Font Size
+    const fontSize = Math.max(18, width / 45); // Slightly smaller for professional look
+    const lineHeight = fontSize * 1.4;
     const padding = 20;
-    const lineHeight = fontSize * 1.3;
-    const maxWidth = width - (padding * 2);
 
-    let lines: string[] = [];
+    // Structured Data for Report
+    const reportData = [];
 
-    // 1. Date/Time
-    lines.push(new Date().toLocaleString());
+    // 1. Date (Bold Label)
+    reportData.push({ label: 'Date:', value: new Date().toLocaleString() });
 
-    // 2. Custom Notes (Moved before address)
-    if (this.customNote1) lines.push(this.customNote1);
-    if (this.customNote2) lines.push(this.customNote2);
-
-    // 3. Location (Conditional Display)
-    const loc = this.locationData;
-    if (loc) {
-      let locationText = '';
-
+    // 2. Location
+    if (this.locationData) {
+      const loc = this.locationData;
+      let locText = '';
       if (this.showAddress) {
-        locationText = loc.address || 'Address not found';
+        locText = loc.address || 'Address not found';
       } else {
-        locationText = `Lat: ${loc.latitude.toFixed(5)}, Long: ${loc.longitude.toFixed(5)}`;
+        locText = `Lat: ${loc.latitude.toFixed(5)}, Long: ${loc.longitude.toFixed(5)}`;
       }
-
-      const addrLines = this.wrapText(ctx, locationText, maxWidth);
-      lines.push(...addrLines);
+      reportData.push({ label: 'Location:', value: locText });
     }
 
-    // Calculate Box
-    const totalTextHeight = lines.length * lineHeight;
-    const boxHeight = totalTextHeight + (padding * 2);
+    // 3. Notes
+    if (this.customNote1) reportData.push({ label: 'Note:', value: this.customNote1 });
+    if (this.customNote2) reportData.push({ label: 'Details:', value: this.customNote2 });
 
-    // Y Calculation based on Position Setting
-    let boxY = padding + 20; // Default Top
-    if (this.overlayPosition === 'bottom') {
-      boxY = height - boxHeight - padding - 20; // 20px margin from bottom
+    // Calculate Box Height
+    // multi-line location might need handling, but for now simple calculation
+    // A simplified text wrap measurer would be ideal, but let's stick to simple first for robustness
+    // assuming width is enough, or wrapping handles it. 
+
+    // We need to pre-calculate lines to handle wrapping
+    const maxWidth = width - (padding * 2);
+    const finalLines: { text: string; isLabel?: boolean; xOffset?: number }[] = [];
+
+    ctx.font = `bold ${fontSize}px Arial`; // Measure with bold for safety
+
+    reportData.forEach(item => {
+      // Label
+      const labelWidth = ctx.measureText(item.label + ' ').width;
+
+      // Wrap Value
+      const valueWords = item.value.split(' ');
+      let currentLine = '';
+
+      // Push Label start
+      finalLines.push({ text: item.label, isLabel: true, xOffset: 0 });
+
+      // We will draw value on THE SAME LINE if it fits, else wrap
+      // Actually, "Report Style" usually aligns value next to label.
+      // Let's try to fit value next to label.
+
+      let currentX = labelWidth;
+      let isFirstWord = true;
+
+      valueWords.forEach((word) => {
+        const wordWidth = ctx.measureText(word + ' ').width;
+        if (currentX + wordWidth < maxWidth) {
+          currentLine += (isFirstWord ? '' : ' ') + word;
+          currentX += wordWidth;
+          isFirstWord = false;
+        } else {
+          // Push current line to "Value" stack for this row (but we simply push text objects)
+          // This simple logic is getting complex for a valid single-pass draw.
+          // Let's use a simpler "Label: Value" string approach but manual bolding.
+        }
+      });
+    });
+
+    // SIMPLIFIED APPROACH: Just render text, but handle formatting individually
+
+    // Re-calculating needed height
+    // Let's wrap lines properly first
+    const drawnLines: { y: number; content: { text: string; bold: boolean; x: number }[] }[] = [];
+    let currentY = 0;
+
+    ctx.font = `normal ${fontSize}px Inter, Arial, sans-serif`;
+
+    reportData.forEach(item => {
+      const label = item.label + ' ';
+      ctx.font = `bold ${fontSize}px Inter, Arial, sans-serif`;
+      const labelWidth = ctx.measureText(label).width;
+
+      const value = item.value;
+      ctx.font = `normal ${fontSize}px Inter, Arial, sans-serif`;
+
+      // Word Wrap the VALUE
+      const words = value.split(' ');
+      let line = '';
+      let firstLine = true;
+
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + ' ';
+        const metrics = ctx.measureText(testLine);
+        const testWidth = metrics.width;
+
+        const availableWidth = firstLine ? (maxWidth - labelWidth) : maxWidth;
+
+        if (testWidth > availableWidth && n > 0) {
+          // Flush Line
+          drawnLines.push({
+            y: currentY,
+            content: firstLine
+              ? [{ text: label, bold: true, x: 0 }, { text: line, bold: false, x: labelWidth }]
+              : [{ text: line, bold: false, x: 0 }]
+          });
+          line = words[n] + ' ';
+          currentY += lineHeight;
+          firstLine = false;
+        } else {
+          line = testLine;
+        }
+      }
+      // Flush Last Line
+      drawnLines.push({
+        y: currentY,
+        content: firstLine
+          ? [{ text: label, bold: true, x: 0 }, { text: line, bold: false, x: labelWidth }]
+          : [{ text: line, bold: false, x: 0 }]
+      });
+      currentY += lineHeight; // New Line after each block
+    });
+
+    const boxHeight = currentY + (padding * 2);
+
+    // Y Position (Bottom aligned)
+    let boxY = height - boxHeight - padding - 20;
+    if (this.overlayPosition === 'top') {
+      boxY = padding + 20;
     }
 
-    // Draw Background
+    // Draw White Semi-Transparent Background
     ctx.save();
-    ctx.beginPath(); // Critical: Reset path to avoid accumulating previous frames
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-    ctx.roundRect(padding, boxY, maxWidth, boxHeight, 15);
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)'; // Light Background
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    ctx.shadowBlur = 10;
+    ctx.roundRect(padding, boxY, maxWidth + (padding), boxHeight, 12);
     ctx.fill();
     ctx.restore();
 
     // Draw Text
-    ctx.fillStyle = 'white';
-    let textY = boxY + padding + fontSize;
+    ctx.fillStyle = '#1a1a1a'; // Dark Text
+    ctx.textBaseline = 'top';
 
-    for (const line of lines) {
-      ctx.fillText(line, padding + 10, textY);
-      textY += lineHeight;
-    }
+    drawnLines.forEach(line => {
+      line.content.forEach(chunk => {
+        ctx.font = `${chunk.bold ? 'bold' : 'normal'} ${fontSize}px Inter, Arial, sans-serif`;
+        ctx.fillText(chunk.text.trim(), padding + padding / 2 + chunk.x, boxY + padding + line.y);
+      });
+    });
   }
 
   wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {

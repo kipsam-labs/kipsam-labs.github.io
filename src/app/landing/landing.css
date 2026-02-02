@@ -2,7 +2,7 @@
     display: block;
     min-height: 100vh;
     background: #000;
-    color: white;
+    color: var(--text-primary);
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
 }
@@ -12,10 +12,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('/assets/hero-bg.png') no-repeat center center/cover;
-    background-attachment: fixed;
-    background-color: #0b0b14;
-    /* Fallback */
+    /* Dynamic Spotlight + Deep Base config */
+    background:
+        radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(0, 122, 255, 0.15),
+            transparent 40%),
+        radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000000 70%);
     position: relative;
     padding: 2rem;
 }
@@ -28,9 +30,10 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    margin-top: 4rem;
+    margin-top: 6rem;
     position: relative;
     z-index: 10;
+    max-width: 800px;
 }
 
 .glow-effect {
@@ -38,124 +41,177 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
-    filter: blur(40px);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0, 122, 255, 0.15) 0%, transparent 70%);
+    filter: blur(80px);
     z-index: -1;
+    pointer-events: none;
 }
 
 .title {
-    font-size: 3.5rem;
+    font-size: 4.5rem;
     font-weight: 800;
-    margin-bottom: 1rem;
-    letter-spacing: -1px;
-    background: linear-gradient(135deg, #ffffff 0%, #a5a5a5 100%);
+    margin-bottom: 1.5rem;
+    letter-spacing: -2px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #888888 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-}
-
-.pro-badge {
-    font-size: 1rem;
-    background: linear-gradient(135deg, #ffd700, #ffaa00);
-    -webkit-text-fill-color: black;
-    padding: 4px 8px;
-    border-radius: 4px;
-    vertical-align: middle;
-    margin-left: 10px;
-    font-weight: 700;
+    line-height: 1.1;
 }
 
 .subtitle {
-    font-size: 1.2rem;
-    color: #888;
-    max-width: 500px;
-    margin-bottom: 3rem;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin-bottom: 3.5rem;
     line-height: 1.6;
+    font-weight: 400;
 }
 
-/* CTA Button */
+/* CTA Buttons */
 .cta-button {
     background: white;
     color: black;
     border: none;
-    padding: 16px 32px;
-    font-size: 1.2rem;
-    font-weight: 600;
+    padding: 18px 36px;
+    font-size: 1.1rem;
+    font-weight: 700;
     border-radius: 50px;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
-    gap: 10px;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    gap: 12px;
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
 }
 
 .cta-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 0 60px rgba(255, 255, 255, 0.3);
 }
 
-.cta-button:active {
-    transform: scale(0.98);
+.cta-button.secondary {
+    background: var(--surface-glass);
+    color: white;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--surface-border);
+    margin-top: 20px;
+    box-shadow: none;
+}
+
+.cta-button.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 /* Features Grid */
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
     width: 100%;
-    max-width: 1000px;
-    margin: 4rem 0;
+    max-width: 1100px;
+    margin: 6rem 0;
 }
 
 .feature-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 2rem;
-    border-radius: 16px;
-    backdrop-filter: blur(10px);
-    transition: transform 0.3s;
+    background: var(--surface-glass-dark);
+    border: 1px solid var(--surface-border);
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: transform 0.3s ease, background 0.3s ease;
+    text-align: left;
 }
 
 .feature-card:hover {
     transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .feature-icon {
     font-size: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     display: block;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.2));
 }
 
 .feature-card h3 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.2rem;
+    margin: 0 0 0.8rem 0;
+    font-size: 1.25rem;
+    font-weight: 700;
     color: white;
 }
 
 .feature-card p {
     margin: 0;
-    font-size: 0.9rem;
-    color: #aaa;
-    line-height: 1.5;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
 }
 
 /* Footer */
 .footer {
-    padding: 2rem;
+    padding: 3rem;
     color: #444;
     font-size: 0.9rem;
+    text-align: center;
+}
+
+.footer a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer a:hover {
+    color: white;
 }
 
 @media (max-width: 768px) {
     .title {
         font-size: 2.5rem;
+        /* Smaller title */
+        line-height: 1.1;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+        padding: 0 10px;
+    }
+
+    .hero-section {
+        margin-top: 2rem;
+        /* Less top margin */
+        padding: 0 1rem;
+    }
+
+    /* Stack buttons on mobile */
+    .cta-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .cta-button.secondary {
+        margin-top: 15px;
     }
 
     .features-grid {
         grid-template-columns: 1fr;
+        /* Single column */
+        gap: 1.5rem;
+        padding: 0;
+        margin: 4rem 0;
+    }
+
+    /* Reduce glow effect size */
+    .glow-effect {
+        width: 300px;
+        height: 300px;
+        filter: blur(50px);
     }
 }

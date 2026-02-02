@@ -43,8 +43,12 @@ export class FeedbackComponent {
                 // Wait for render
                 await new Promise(r => setTimeout(r, 100));
 
-                const canvas = await html2canvas(document.body);
-                blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+                const canvas = await html2canvas(document.body, {
+                    scale: 0.5,
+                    logging: false,
+                    useCORS: true
+                });
+                blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.4));
 
                 this.isOpen = true; // Show again
             }
