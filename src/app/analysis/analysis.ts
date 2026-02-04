@@ -19,6 +19,7 @@ export class AnalysisComponent implements OnInit {
     map: L.Map | null = null;
     marker: L.Marker | null = null;
     error: string | null = null;
+    isAnalyzing = false;
 
     ngOnInit() {
         // Icon fix for Leaflet in Angular
@@ -52,9 +53,17 @@ export class AnalysisComponent implements OnInit {
 
     analyzeImage(dataUrl: string) {
         console.log('Analyzing image...');
+        this.isAnalyzing = true;
         this.error = null;
         this.metadata = {};
 
+        // Small timeout to allow UI to update to loading state
+        setTimeout(() => {
+            this.processImage(dataUrl);
+        }, 100);
+    }
+
+    processImage(dataUrl: string) {
         try {
             console.log('Loading EXIF data...');
             const exifObj = piexif.load(dataUrl);
@@ -66,8 +75,9 @@ export class AnalysisComponent implements OnInit {
             if (!gps || !Object.keys(gps).length) {
                 this.error = "No GPS metadata found in this image.";
                 console.warn(this.error);
-                alert(this.error); // Alert user directly
                 return;
+                // isAnalyzing will be reset in finally block if we throw or just return? Wait, need to move logic or ensure finally runs. 
+                // Since this is inside try block, finally will run after return!
             }
 
             // Extract GPS
@@ -91,7 +101,8 @@ export class AnalysisComponent implements OnInit {
         } catch (e: any) {
             console.error('Analysis Error:', e);
             this.error = "Failed to parse image data. Ensure it is a valid JPEG. Error: " + e.message;
-            alert(this.error);
+        } finally {
+            this.isAnalyzing = false;
         }
     }
 

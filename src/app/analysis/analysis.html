@@ -12,6 +12,11 @@
         </label>
     </div>
 
+    <div class="loading-state" *ngIf="isAnalyzing">
+        <div class="spinner"></div>
+        <p>Analyzing photo metadata...</p>
+    </div>
+
     <div class="content-grid" *ngIf="selectedImage">
         <div class="image-preview">
             <img [src]="selectedImage" alt="Analyzed Photo">

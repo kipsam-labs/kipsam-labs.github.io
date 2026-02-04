@@ -43,4 +43,8 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
+src/app/gps-camera-76331-firebase-adminsdk-fbsvc-620873af08.json
+
 src/app/YOUR_PROJECT_ID_HERE-firebase-adminsdk-fbsvc-620873af08.json
+src/environments/environment.ts
+src/environments/environment.prod.ts

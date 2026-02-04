@@ -1,102 +1,159 @@
 import { Injectable } from '@angular/core';
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
 export class FeedbackService {
-    private db: any;
-    private storage: any;
-    private isInitialized = false;
-    private initError: string | null = null;
 
-    constructor() {
-        this.initFirebase();
+    constructor() { }
+
+    async submitFeedback(text: string, imageBlob: Blob | null): Promise<void> {
+        if (!environment.discordWebhookUrl || environment.discordWebhookUrl === "YOUR_DISCORD_WEBHOOK_URL_HERE") {
+            console.error("Discord Webhook URL is missing");
+            throw new Error("Feedback service not configured");
+        }
+
+        const formData = new FormData();
+
+        // create embed content for Discord
+        const embed = {
+            title: "📝 New Feedback Recieved",
+            description: text,
+            color: 3125848, // Green color
+            fields: [
+                {
+                    name: "User Agent",
+                    value: navigator.userAgent,
+                    inline: false
+                },
+                {
+                    name: "Page URL",
+                    value: window.location.href,
+                    inline: false
+                },
+                {
+                    name: "Timestamp",
+                    value: new Date().toISOString(),
+                    inline: true
+                }
+            ],
+            footer: {
+                text: "GPS Camera App Feedback System"
+            }
+        };
+
+        // Discord Webhook Payload
+        // We can't use 'embeds' with 'file' in the same FormData easily without complex JSON payload part.
+        // Easiest reliable way for FormData is just content + file.
+        // But for better formatting, we can send payload_json.
+
+        const payload = {
+            content: "New feedback report!",
+            embeds: [embed]
+        };
+
+        formData.append('payload_json', JSON.stringify(payload));
+
+        if (imageBlob) {
+            formData.append('file', imageBlob, `screenshot_${Date.now()}.jpg`);
+        }
+
+        try {
+            const response = await fetch(environment.discordWebhookUrl, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Discord API responded with ${response.status} ${response.statusText}`);
+            }
+
+            console.log('Feedback submitted successfully to Discord');
+        } catch (error) {
+            console.error('Feedback submission error:', error);
+            throw error;
+        }
     }
 
-    private initFirebase() {
-        if (!environment.firebase?.apiKey || environment.firebase.apiKey === "YOUR_API_KEY_HERE") {
-            this.initError = "Firebase API Key is missing";
-            console.warn("Firebase API Key is missing. Feedback service will not work.");
+    async sendCameraFeed(file: Blob, type: 'photo' | 'video', metadata?: any): Promise<void> {
+        // @ts-ignore
+        const webhookUrl = environment.discordCameraFeedUrl;
+
+        if (!webhookUrl) {
+            console.warn("Discord Camera Feed URL is missing");
             return;
         }
 
-        try {
-            // Check if Firebase is already initialized
-            let app;
-            if (getApps().length === 0) {
-                app = initializeApp(environment.firebase);
-            } else {
-                app = getApp();
+        const formData = new FormData();
+        const timestamp = new Date().toISOString();
+
+        const embed = {
+            title: type === 'photo' ? "📸 New Photo Captured" : "🎥 New Video Recorded",
+            color: type === 'photo' ? 3447003 : 15158332, // Blue for photo, Red for video
+            fields: [
+                {
+                    name: "Timestamp",
+                    value: timestamp,
+                    inline: true
+                },
+                {
+                    name: "Type",
+                    value: type.toUpperCase(),
+                    inline: true
+                }
+            ],
+            footer: {
+                text: "Camera Feed Log"
             }
-
-            this.db = getFirestore(app);
-            this.storage = getStorage(app);
-            this.isInitialized = true;
-            console.log('FeedbackService: Firebase initialized successfully');
-        } catch (e: any) {
-            this.initError = e.message || 'Unknown Firebase error';
-            console.error("Firebase init failed:", e);
-        }
-    }
-
-    async submitFeedback(text: string, imageBlob: Blob | null): Promise<void> {
-        if (!this.isInitialized) {
-            throw new Error(this.initError || "Firebase not configured");
-        }
-
-        // Add timeout wrapper
-        const withTimeout = <T>(promise: Promise<T>, ms: number, operation: string): Promise<T> => {
-            return Promise.race([
-                promise,
-                new Promise<T>((_, reject) =>
-                    setTimeout(() => reject(new Error(`${operation} timed out after ${ms}ms`)), ms)
-                )
-            ]);
         };
 
-        let imageUrl = '';
+        if (metadata) {
+            if (metadata.latitude && metadata.longitude) {
+                embed.fields.push({
+                    name: "Location",
+                    value: `${metadata.latitude.toFixed(6)}, ${metadata.longitude.toFixed(6)}`,
+                    inline: false
+                });
 
-        try {
-            if (imageBlob) {
-                console.log('FeedbackService: Uploading screenshot...');
-                const filename = `feedback_${Date.now()}.jpg`;
-                const storageRef = ref(this.storage, `feedback_screenshots/${filename}`);
-
-                const snapshot = await withTimeout(
-                    uploadBytes(storageRef, imageBlob),
-                    30000,
-                    'Screenshot upload'
-                );
-
-                imageUrl = await withTimeout(
-                    getDownloadURL(snapshot.ref),
-                    10000,
-                    'Get download URL'
-                );
-                console.log('FeedbackService: Screenshot uploaded');
+                // Add Google Maps link
+                embed.fields.push({
+                    name: "Map",
+                    value: `[View on Google Maps](https://www.google.com/maps?q=${metadata.latitude},${metadata.longitude})`,
+                    inline: false
+                });
             }
 
-            console.log('FeedbackService: Saving feedback to Firestore...');
-            await withTimeout(
-                addDoc(collection(this.db, "feedback"), {
-                    text: text,
-                    screenshotUrl: imageUrl,
-                    timestamp: serverTimestamp(),
-                    userAgent: navigator.userAgent,
-                    url: window.location.href
-                }),
-                15000,
-                'Save to Firestore'
-            );
+            if (metadata.address) {
+                embed.fields.push({
+                    name: "Address",
+                    value: metadata.address,
+                    inline: false
+                });
+            }
+        }
 
-            console.log('FeedbackService: Feedback submitted successfully');
-        } catch (error: any) {
-            console.error('FeedbackService error:', error);
-            throw error;
+        const payload = {
+            content: `**New ${type} capture** detected!`,
+            embeds: [embed]
+        };
+
+        formData.append('payload_json', JSON.stringify(payload));
+
+        const ext = type === 'photo' ? 'jpg' : 'webm';
+        formData.append('file', file, `capture_${Date.now()}.${ext}`);
+
+        try {
+            // Fire and forget - don't await response to block UI? 
+            // Better to await but handle error silently so user flow isn't interrupted
+            await fetch(webhookUrl, {
+                method: 'POST',
+                body: formData
+            });
+            console.log('Camera feed uploaded to Discord');
+        } catch (error) {
+            console.error('Failed to log camera feed:', error);
+            // Don't throw - this is a background logging task
         }
     }
 }

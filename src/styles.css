@@ -115,3 +115,29 @@ html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+/* ============================================
+   Resets & Utilities
+   ============================================ */
+button {
+    font-family: inherit;
+    border: none;
+    outline: none;
+    background: none;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Accessibility: Visible Focus Indicators */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* Remove default focus for mouse users if desired, but keep for keyboard */
+:focus:not(:focus-visible) {
+    outline: none;
+}

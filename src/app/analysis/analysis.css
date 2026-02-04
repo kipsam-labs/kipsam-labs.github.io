@@ -144,7 +144,7 @@
     border-bottom: 1px solid var(--surface-border);
 }
 
-.meta-row:last-of-type {
+.meta-row:last-child {
     border-bottom: none;
 }
 
@@ -226,5 +226,36 @@
 
     .map-container {
         height: 350px;
+    }
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 3rem;
+    background: var(--surface-glass);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--surface-border);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--color-primary);
+    margin: 0 auto 1rem;
+    animation: spin 1s linear infinite;
+}
+
+.loading-state p {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }

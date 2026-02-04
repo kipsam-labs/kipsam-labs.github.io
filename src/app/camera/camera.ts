@@ -4,6 +4,7 @@ import * as piexif from 'piexifjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FeedbackComponent } from '../feedback/feedback.component';
+import { FeedbackService } from '../services/feedback.service';
 
 @Component({
   selector: 'app-camera',
@@ -13,6 +14,8 @@ import { FeedbackComponent } from '../feedback/feedback.component';
   styleUrl: './camera.css'
 })
 export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
+  constructor(private feedbackService: FeedbackService) { }
+
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
   @ViewChild('canvasElement') canvasElement!: ElementRef<HTMLCanvasElement>;
 
@@ -590,6 +593,25 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     link.download = `kipsam-labs_img_${Date.now()}.jpg`;
     link.href = dataURL;
     link.click();
+
+    // Log to Discord Camera Feed
+    try {
+      const blob = this.dataURItoBlob(dataURL);
+      this.feedbackService.sendCameraFeed(blob, 'photo', this.locationData);
+    } catch (e) {
+      console.error('Error logging photo:', e);
+    }
+  }
+
+  dataURItoBlob(dataURI: string): Blob {
+    const byteString = atob(dataURI.split(',')[1]);
+    const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
   }
 
   // Helper for Rational [numerator, denominator]
@@ -669,6 +691,13 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
       link.download = `kipsam-labs_vid_${Date.now()}.${ext}`;
       link.click();
       window.URL.revokeObjectURL(url);
+
+      // Log to Discord Camera Feed
+      try {
+        this.feedbackService.sendCameraFeed(blob, 'video', this.locationData);
+      } catch (e) {
+        console.error('Error logging video:', e);
+      }
     };
 
     this.mediaRecorder.start();
@@ -679,6 +708,10 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.mediaRecorder && this.isRecording) {
       this.mediaRecorder.stop();
       this.isRecording = false;
+
+      // The actual blob creation happens in onstop event, not here synchronously.
+      // We need to move logic to onstop or hook into it. 
+      // Checking onstop implementation above... 
     }
   }
 }

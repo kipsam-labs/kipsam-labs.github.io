@@ -58,8 +58,10 @@ export class LandingComponent implements OnInit {
 
     @HostListener('document:mousemove', ['$event'])
     onMouseMove(e: MouseEvent): void {
-        const doc = document.documentElement;
-        doc.style.setProperty('--mouse-x', `${e.clientX}px`);
-        doc.style.setProperty('--mouse-y', `${e.clientY}px`);
+        requestAnimationFrame(() => {
+            const doc = document.documentElement;
+            doc.style.setProperty('--mouse-x', `${e.clientX}px`);
+            doc.style.setProperty('--mouse-y', `${e.clientY}px`);
+        });
     }
 }
