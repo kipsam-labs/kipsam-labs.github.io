@@ -68,12 +68,13 @@
                     <label>Tag / Detail</label>
                     <input type="text" [(ngModel)]="customNote2" placeholder="Type here...">
                 </div>
+                <button class="done-btn" (click)="toggleSettings()">Done</button>
             </div>
         </div>
 
         <!-- Center: Capture -->
         <div class="control-group center">
-            <button class="shutter-btn" (click)="capturePhoto()" title="Take Photo">
+            <button class="shutter-btn" (click)="capturePhoto()" title="Take Photo" [disabled]="!isLocationReady">
                 <div class="inner"></div>
             </button>
         </div>
@@ -81,7 +82,7 @@
         <!-- Right: Video -->
         <div class="control-group right">
             <button class="video-btn" [class.recording]="isRecording" (click)="toggleVideoRecording()"
-                title="Record Video">
+                title="Record Video" [disabled]="!isLocationReady">
                 <div class="icon"></div>
             </button>
         </div>

@@ -9,6 +9,8 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    overscroll-behavior: none;
+    /* Prevent browser pull-to-refresh effects */
 }
 
 canvas {
@@ -21,7 +23,8 @@ canvas {
 /* Top Toolbar */
 .top-toolbar {
     position: absolute;
-    top: 20px;
+    top: calc(20px + env(safe-area-inset-top));
+    /* Respect Dynamic Island/Notch */
     right: 20px;
     display: flex;
     gap: 12px;
@@ -29,8 +32,9 @@ canvas {
 }
 
 .toolbar-btn {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    /* Larger touch target */
+    height: 48px;
     border-radius: 50%;
     background: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
@@ -59,14 +63,15 @@ canvas {
 }
 
 .toolbar-btn .icon {
-    font-size: 20px;
+    font-size: 22px;
 }
 
 /* Error Banners */
 .error-banner,
 .warning-banner {
     position: absolute;
-    top: 20px;
+    top: calc(60px + env(safe-area-inset-top));
+    /* Push below toolbar */
     left: 50%;
     transform: translateX(-50%);
     width: 90%;
@@ -200,14 +205,15 @@ canvas {
 /* Buttons */
 .settings-btn,
 .video-btn {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    /* Larger touch target */
+    height: 48px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     border: none;
     color: white;
-    font-size: 22px;
+    font-size: 24px;
     cursor: pointer;
     display: flex;
     justify-content: center;
@@ -232,13 +238,23 @@ canvas {
     transform: scale(0.95);
 }
 
+.shutter-btn:disabled,
+.video-btn:disabled {
+    opacity: 0.5;
+    filter: grayscale(100%);
+    cursor: not-allowed;
+    transform: none;
+}
+
 .shutter-btn .inner {
     width: 100%;
     height: 100%;
     background: white;
     border-radius: 50%;
+    transition: all 0.2s;
 }
 
+/* Video Button Specifics */
 .video-btn .icon {
     width: 18px;
     height: 18px;
@@ -248,12 +264,16 @@ canvas {
 }
 
 .video-btn.recording .icon {
-    border-radius: 4px;
-    transform: scale(0.8);
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    /* Square stop icon */
 }
 
+/* Animation for Recording State handled in HTML classes, but basic border is here */
 .video-btn.recording {
     border: 2px solid #ff4444;
+    background: rgba(255, 68, 68, 0.2);
 }
 
 /* Settings Modal */
@@ -264,13 +284,14 @@ canvas {
     transform: translate(-50%, -50%);
     width: 90%;
     max-width: 320px;
-    background: rgba(25, 25, 25, 0.95);
+    background: rgba(20, 20, 20, 0.95);
+    /* Slightly darker/more opaque */
     backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
     padding: 24px;
     color: white;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
     animation: fadeIn 0.2s ease-out;
     z-index: 100;
 }
@@ -288,35 +309,45 @@ canvas {
 }
 
 .settings-panel h3 {
-    margin: 0 0 15px 0;
-    font-size: 16px;
-    font-weight: 600;
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    font-weight: 700;
     color: #fff;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
 }
 
 .input-group {
-    margin-bottom: 12px;
+    margin-bottom: 16px;
 }
 
 .input-group label {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
+    /* More readable */
     text-transform: uppercase;
-    color: #888;
-    margin-bottom: 6px;
+    color: #aaa;
+    margin-bottom: 8px;
     font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .input-group input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 12px;
+    border-radius: 12px;
+    padding: 14px;
     color: white;
-    font-size: 15px;
+    font-size: 16px;
+    /* Prevents auto-zoom on iOS inputs */
     outline: none;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    border-color: rgba(255, 255, 255, 0.4);
 }
 
 /* Toggle Group for Position */
@@ -342,4 +373,23 @@ canvas {
     background: rgba(255, 255, 255, 0.2);
     color: white;
     font-weight: bold;
+}
+
+.done-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.done-btn:active {
+    opacity: 0.9;
+    transform: scale(0.98);
 }

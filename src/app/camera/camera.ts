@@ -498,11 +498,40 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     ctx.fillStyle = '#1a1a1a'; // Dark Text
     ctx.textBaseline = 'top';
 
-    drawnLines.forEach(line => {
-      line.content.forEach(chunk => {
-        ctx.font = `${chunk.bold ? 'bold' : 'normal'} ${fontSize}px Inter, Arial, sans-serif`;
-        ctx.fillText(chunk.text.trim(), padding + padding / 2 + chunk.x, boxY + padding + line.y);
+    let currentTextY = boxY + padding;
+
+    reportData.forEach(item => {
+      const label = item.label + ' ';
+      ctx.font = `bold ${fontSize}px Inter, Arial, sans-serif`;
+      const labelWidth = ctx.measureText(label).width;
+
+      // Draw Label
+      ctx.fillText(label, padding + padding / 2, currentTextY);
+
+      // Draw Value (Wrapped)
+      ctx.font = `normal ${fontSize}px Inter, Arial, sans-serif`;
+      const value = item.value;
+      const valueLines = this.wrapText(ctx, value, maxWidth - labelWidth);
+
+      valueLines.forEach((line, index) => {
+        // First line starts after label, subsequent lines align with label start (hanging indent) or just start at 0?
+        // Let's align execution to simple left-align for subsequent lines to save space or align under value.
+        // "Report style" usually aligns under the value field.
+        const xOffset = index === 0 ? labelWidth : 0; // Simple wrap to start of line for now to maximize space
+        // Actually, let's try to keep it clean: if multi-line, maybe put on next line?
+        // Let's stick to the requested "wrap" - standard paragraph style.
+
+        // If line 0, draw at labelWidth. If line > 0, draw at 0 (or labelWidth indentation?)
+        // Let's do indentation for better read.
+        const xPos = padding + padding / 2 + (index === 0 ? labelWidth : 0);
+        ctx.fillText(line, xPos, currentTextY);
+
+        // Increment Y for next line
+        if (index < valueLines.length - 1) {
+          currentTextY += lineHeight;
+        }
       });
+      currentTextY += lineHeight; // Space after full item
     });
   }
 
@@ -526,6 +555,11 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   capturePhoto() {
+    if (!this.isLocationReady) {
+      alert('Waiting for GPS location...');
+      return;
+    }
+
     const canvas = this.canvasElement.nativeElement;
     let dataURL = canvas.toDataURL('image/jpeg', 1.0);
 
@@ -631,7 +665,16 @@ export class CameraComponent implements OnInit, AfterViewInit, OnDestroy {
     return [[degrees, 1], [minutes, 1], [seconds, 100]];
   }
 
+  get isLocationReady(): boolean {
+    return this.locationData !== null && this.locationData.latitude !== 0;
+  }
+
   toggleVideoRecording() {
+    if (!this.isLocationReady) {
+      alert('Waiting for GPS location...');
+      return;
+    }
+
     if (this.isRecording) {
       this.stopRecording();
     } else {
